@@ -8,10 +8,14 @@ from rest_framework.response import Response
 from .models import User
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @parser_classes([JSONParser])
-def one_user(request: HttpRequest, id: str):
-    return Response(data=User.objects.all().filter(pk=id).values(), status=200)
+def one_user(request: HttpRequest, id: int):
+    if request.method == 'GET':
+        return Response(data=User.objects.all().filter(pk=id).values(), status=200)
+    
+    User.objects.filter(pk=id).delete()
+    return Response(status=203)
 
 @api_view(['GET'])
 @parser_classes([JSONParser])
@@ -39,6 +43,5 @@ def create_user(request: HttpRequest):
     except Exception as e:
         raise e
     return Response(status=201)
-
-
+    
     
