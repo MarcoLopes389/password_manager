@@ -5,7 +5,10 @@ from rest_framework.parsers import JSONParser
 from rest_framework.request import HttpRequest
 from rest_framework.response import Response
 
-from .models import User
+from .errors import ValidationError
+from .models import Password, User
+from .services import offuscator
+from .validators import password_validator
 
 
 @api_view(['GET', 'DELETE'])
@@ -44,4 +47,30 @@ def create_user(request: HttpRequest):
         raise e
     return Response(status=201)
     
-    
+
+@api_view(['POST'])
+def create_password(request: HttpRequest):
+    if not request.body:
+        return Response(status=400)
+    body = json.loads(request.body)
+
+    try:
+        password_validator(body)
+    except ValidationError as e:
+        print(e)
+        return Response(status=400, data={'error': True, 'message': str(e)})
+
+    user = User.objects.filter(pk=body['owner']).get()
+
+    if not user:
+        return Response(status=400, data={'error': True, 'message': 'User not exists'})
+
+    password = Password()
+
+    password.value = offuscator(body['password'])
+    password.expires = body['expires']
+    password.owner = user
+
+    return Response(status=201)
+
+

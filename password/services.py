@@ -20,7 +20,6 @@ def offuscator(password: str) -> str:
             if index > len(password):
                 break
 
-            print(password[start:next])
             final_string += jwt.encode({'pass': password[start:next]}, passphrases[i]) + '|'
 
             start += factor
