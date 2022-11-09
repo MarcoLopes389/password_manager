@@ -18,3 +18,4 @@ class Password(models.Model):
     value = models.CharField(max_length=100)
     expires = models.BooleanField()
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    expire_date = models.DateTimeField()

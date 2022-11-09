@@ -1,4 +1,8 @@
+from datetime import datetime
+
 import jwt
+
+from password.models import Password
 
 # This function that will contain the algoritm to pretect the passwords
 passphrases = ['kosasd', 'axiw', 'sdcus', 'hwshxw', 'sdcnwsi']
@@ -55,3 +59,11 @@ def deoffuscator(password: str) -> str:
             index += 1
 
     return ''.join(peaces)
+
+def deoffuscate_model(password: Password):
+    deoffuscated = deoffuscator(password['value'])
+    password['value'] = deoffuscated
+    return password
+
+def delete_expired_passes():
+    Password.objects.filter(expires=True, expire_date__lte=datetime.today()).delete()

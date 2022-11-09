@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from .errors import ValidationError
 from .models import Password, User
-from .services import offuscator
+from .services import deoffuscate_model, offuscator
 from .validators import password_validator
 
 
@@ -70,9 +70,20 @@ def create_password(request: HttpRequest):
     password.value = offuscator(body['password'])
     password.expires = body['expires']
     password.owner = user
+    password.expire_date = body['expire_date']
 
     password.save()
 
     return Response(status=201)
 
+@api_view(['GET'])
+def get_my_passes(request:HttpRequest, userId: int):
+    user = User.objects.filter(pk=userId).get()
 
+    if not user:
+        return Response(status=400, data={'error': True, 'message': 'User not exists'})
+
+    passes = list(map(deoffuscate_model, Password.objects.filter(owner_id=userId).values()))
+
+    return Response(data=passes, status=200)
+    
