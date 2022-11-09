@@ -1,9 +1,12 @@
 import json
+
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser
-from .models import User
 from rest_framework.request import HttpRequest
 from rest_framework.response import Response
+
+from .models import User
+
 
 @api_view(['GET', 'POST'])
 @parser_classes([JSONParser])
@@ -27,6 +30,8 @@ def user_list(request: HttpRequest):
             user.save()
         except KeyError:
            return Response(status=400, data={'error': True, 'message': 'Bad Request'})
+        except Exception as e:
+            raise e
 
         return Response(status=201)
     

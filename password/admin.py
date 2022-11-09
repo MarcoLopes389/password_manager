@@ -1,6 +1,7 @@
-from django.contrib.admin import register, ModelAdmin
-from django.db import models
+from django.contrib.admin import ModelAdmin, register
+
 from .models import User
+
 
 @register(User)
 class UserAdmin(ModelAdmin):
