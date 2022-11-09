@@ -58,7 +58,7 @@ def create_password(request: HttpRequest):
         password_validator(body)
     except ValidationError as e:
         print(e)
-        return Response(status=400, data={'error': True, 'message': str(e)})
+        return Response(status=400, data={'error': True, 'message': e.message})
 
     user = User.objects.filter(pk=body['owner']).get()
 
@@ -70,6 +70,8 @@ def create_password(request: HttpRequest):
     password.value = offuscator(body['password'])
     password.expires = body['expires']
     password.owner = user
+
+    password.save()
 
     return Response(status=201)
 

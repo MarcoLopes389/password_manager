@@ -2,9 +2,17 @@ from .errors import ValidationError
 
 
 def password_validator(body):
-    if not body['owner']:
+    try:
+        body['owner']
+    except:
         raise ValidationError("Please send owner")
-    if not body['password']:
-        raise ValidationError("Please send value")
-    if not body['expires']:
+    
+    try:
+        body['password']
+    except:
+        raise ValidationError("Please send password")
+    
+    try:
+        body['expires']
+    except:
         raise ValidationError("Please send expires")
