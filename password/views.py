@@ -8,30 +8,37 @@ from rest_framework.response import Response
 from .models import User
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 @parser_classes([JSONParser])
-def user_list(request: HttpRequest):
-    if request.method == 'GET':
-        return Response(data=User.objects.values(), status=200)
-    if request.method == 'POST':
-        if not request.body:
-            return Response(status=400)
+def one_user(request: HttpRequest, id: str):
+    return Response(data=User.objects.all().filter(pk=id).values(), status=200)
 
-        body = json.loads(request.body)
+@api_view(['GET'])
+@parser_classes([JSONParser])
+def all_users(request: HttpRequest):
+    users = User.objects.values()
+    print(users)
+    return Response(data=users, status=200)
 
-        user = User()
+@api_view(['POST'])
+@parser_classes([JSONParser])
+def create_user(request: HttpRequest):
+    if not request.body:
+        return Response(status=400)
+    body = json.loads(request.body)
+    user = User()
+    try:
+        user.nick = body['nick']
+        user.name = body['name']
+        user.email = body['email']
+        user.phone = body['phone']
+        user.wordpass = body['wordpass']
+        user.save()
+    except KeyError:
+       return Response(status=400, data={'error': True, 'message': 'Bad Request'})
+    except Exception as e:
+        raise e
+    return Response(status=201)
 
-        try:
-            user.nick = body['nick']
-            user.name = body['name']
-            user.email = body['email']
-            user.phone = body['phone']
-            user.wordpass = body['wordpass']
-            user.save()
-        except KeyError:
-           return Response(status=400, data={'error': True, 'message': 'Bad Request'})
-        except Exception as e:
-            raise e
 
-        return Response(status=201)
     
